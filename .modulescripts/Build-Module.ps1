@@ -1,8 +1,8 @@
 param (
     #Manual params
-    [string]$Description = "This is a module with functions to help with DESCRIPTION.",
-    [array]$Tags = @("TAG1","TAG2"),
-    [version]$PsVersion = "7.2",
+    [string]$Description = "pfSense API integration.",
+    [array]$Tags = @("pfSense","API"),
+    [version]$PsVersion = "5.1",
     [string]$Author = "NorskNoobing",
 
     #Optional params
