@@ -5,37 +5,30 @@ function Invoke-PfFirewallApply {
     )
 
     process {
-        $Uri = "$(Get-PfEndpoint)/api/v1/firewall/apply"
-        #Parameters to exclude in Uri build
         $ParameterExclusion = @()
-        #Build request Uri
+        $Body = $null
         $PSBoundParameters.Keys.ForEach({
             [string]$Key = $_
-            [string]$Value = $PSBoundParameters.$key
+            $Value = $PSBoundParameters.$key
         
-            #Check if parameter is excluded
             if ($ParameterExclusion -contains $Key) {
                 return
             }
         
-            #Check for "?" in Uri and set delimiter
-            if (!($Uri -replace "[^?]+")) {
-                $Delimiter = "?"
-            } else {
-                $Delimiter = "&"
+            $Body = $Body + @{
+                $Key = $Value
             }
-        
-            $Uri = "$Uri$Delimiter$Key=$Value"
         })
 
         $Splat = @{
-            "Uri" = $Uri
+            "Uri" = "$(Get-PfEndpoint)/api/v1/firewall/apply"
             "Method" = "POST"
             "Headers" = @{
                 "Accept" = "application/json"
                 "Content-Type" = "application/json"
                 "Authorization" = "Basic $(Get-PfAccessToken)"
             }
+            "Body" = $Body | ConvertTo-Json -Depth 99
         }
         Invoke-RestMethod @Splat
     }

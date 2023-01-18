@@ -28,7 +28,7 @@ function Update-PfInterface {
         [string]$gateway,
         [string]$gateway_6rd,
         [string]$gatewayv6,
-        [string]$id,
+        [Parameter(Mandatory)][string]$id,
         [string]$if,
         [string]$ipaddr,
         [string]$ipaddrv6,
@@ -48,20 +48,18 @@ function Update-PfInterface {
     )
 
     process {
-        $Uri = "$(Get-PfEndpoint)/api/v1/interface"
-        #Parameters to exclude in Uri build
-        $ParameterExclusion = @()
         #Parameters to convert with dashes
         $DashParameters = @(
             "alias_address","alias_subnet","gateway_6rd","prefix_6rd",
             "prefix_6rd_v4plen","track6_interface","track6_prefix_id_hex"
         )
-        #Build request Uri
+
+        $ParameterExclusion = @()
+        $Body = $null
         $PSBoundParameters.Keys.ForEach({
             [string]$Key = $_
-            [string]$Value = $PSBoundParameters.$key
-        
-            #Check if parameter is excluded
+            $Value = $PSBoundParameters.$key
+
             if ($ParameterExclusion -contains $Key) {
                 return
             }
@@ -69,19 +67,22 @@ function Update-PfInterface {
             if ($DashParameters -contains $Key) {
                 $Key = $Key -replace "_","-"
             }
-        
-            if ($Value.GetType().BaseType.Name -eq "Array") {
-                $Value = $Value -join ","
+
+            $Body = $Body + @{
+                $Key = $Value
             }
-        
-            #Check for "?" in Uri and set delimiter
-            if (!($Uri -replace "[^?]+")) {
-                $Delimiter = "?"
-            } else {
-                $Delimiter = "&"
-            }
-        
-            $Uri = "$Uri$Delimiter$Key=$Value"
         })
+
+        $Splat = @{
+            "Uri" = "$(Get-PfEndpoint)/api/v1/interface"
+            "Method" = "PUT"
+            "Headers" = @{
+                "Accept" = "application/json"
+                "Content-Type" = "application/json"
+                "Authorization" = "Basic $(Get-PfAccessToken)"
+            }
+            "Body" = $Body | ConvertTo-Json -Depth 99
+        }
+        Invoke-RestMethod @Splat
     }
 }

@@ -5,9 +5,8 @@ function Get-PfFirewallRules {
     )
 
     process {
-        $Uri = "$(Get-PfEndpoint)/api/v1/firewall/rule"
         $Splat = @{
-            "Uri" = $Uri
+            "Uri" = "$(Get-PfEndpoint)/api/v1/firewall/rule"
             "Method" = "GET"
             "Headers" = @{
                 "Accept" = "application/json"

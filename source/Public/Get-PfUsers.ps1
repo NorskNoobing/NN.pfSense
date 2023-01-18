@@ -5,9 +5,8 @@ function Get-PfUsers {
     )
 
     process {
-        $Uri = "$(Get-PfEndpoint)/api/v1/user"
         $Splat = @{
-            "Uri" = $Uri
+            "Uri" = "$(Get-PfEndpoint)/api/v1/user"
             "Method" = "GET"
             "Headers" = @{
                 "Accept" = "application/json"

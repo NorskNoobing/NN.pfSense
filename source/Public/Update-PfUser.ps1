@@ -4,46 +4,39 @@ function Update-PfUser {
         [string]$authorizedkeys,
         [array]$cert,
         [string]$decr,
-        [string][ValidateSet("true","false")]$disabled = "false",
+        [string][ValidateSet("true","false")]$disabled,
         [string]$expires,
         [string]$ipsecpsk,
         [string]$password,
         [array]$priv,
-        [string]$username
+        [Parameter(Mandatory)][string]$username
     )
 
     process {
-        $Uri = "$(Get-PfEndpoint)/api/v1/user"
-        #Parameters to exclude in Uri build
         $ParameterExclusion = @()
-        #Build request Uri
+        $Body = $null
         $PSBoundParameters.Keys.ForEach({
             [string]$Key = $_
-            [string]$Value = $PSBoundParameters.$key
+            $Value = $PSBoundParameters.$key
         
-            #Check if parameter is excluded
             if ($ParameterExclusion -contains $Key) {
                 return
             }
         
-            #Check for "?" in Uri and set delimiter
-            if (!($Uri -replace "[^?]+")) {
-                $Delimiter = "?"
-            } else {
-                $Delimiter = "&"
+            $Body = $Body + @{
+                $Key = $Value
             }
-        
-            $Uri = "$Uri$Delimiter$Key=$Value"
         })
 
         $Splat = @{
-            "Uri" = $Uri
-            "Method" = "POST"
+            "Uri" = "$(Get-PfEndpoint)/api/v1/user"
+            "Method" = "PUT"
             "Headers" = @{
                 "Accept" = "application/json"
                 "Content-Type" = "application/json"
                 "Authorization" = "Basic $(Get-PfAccessToken)"
             }
+            "Body" = $Body | ConvertTo-Json -Depth 99
         }
         Invoke-RestMethod @Splat
     }

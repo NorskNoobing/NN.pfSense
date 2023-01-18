@@ -5,9 +5,8 @@ function Get-PfHostname {
     )
 
     process {
-        $Uri = "$(Get-PfEndpoint)/api/v1/system/hostname"
         $Splat = @{
-            "Uri" = $Uri
+            "Uri" = "$(Get-PfEndpoint)/api/v1/system/hostname"
             "Method" = "GET"
             "Headers" = @{
                 "Accept" = "application/json"
