@@ -11,7 +11,7 @@ function New-PfEndpoint {
             $null = New-Item -ItemType Directory $EndpointDir
         }
 
-        $IP = Read-Host "Enter the IP of your pfSense install" -AsSecureString
+        $IP = Read-Host "Enter the IP of your pfSense install (including http:// or https://)" -AsSecureString
         $IP | Export-Clixml $EndpointPath
     }
 }
